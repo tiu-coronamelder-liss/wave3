@@ -61,7 +61,7 @@ my_palette8blue <- c(brewer.pal(11, "RdGy")[c(11)], brewer.pal(11, "Blues")[c(7,
 
 ################ Set up data preprocessing and analysis #############################
 ##### Load dataset (not included on Github)
-data_in <- read.spss('L_Corona_app_wave2_3p.sav', to.data.frame=TRUE, use.missings=FALSE)
+data_in <- read.spss('L_Corona_app_wave3_3p.sav', to.data.frame=TRUE, use.missings=FALSE)
 
 # Filter out the respondents that did not complete the entire survey (N = 10)
 data <- data_in[!is.na(data_in$duur),]
@@ -111,7 +111,6 @@ attr(data$nettocat_simplified,'label')  <- 'Netto maandinkomen'
 attr(data$oplmet_simplified,'label')  <- 'Hoogste opleiding met diploma'
 attr(data$burgstat_simplified,'label')  <- 'Burgerlijke staat'
 attr(data$woonvorm,'label')  <- 'Woonvorm huishouden'
-attr(data$Riskgroup_contact,'label')  <- 'Frequentie op minder dan 1.5m van ouderen en mensen met een kwetsbare gezondheid zijn vanwege werk en/of (privé) zorgtaken'
 
 ### Rename unclear levels (this is the LISS category label but only 17 and older are included in current sample)
 levels(data$lftdcat)[levels(data$lftdcat)=="15 - 24 jaar"] <- "17 - 24 jaar"
@@ -152,7 +151,6 @@ attr(data_currentvsneveruser$nettocat_simplified,'label')  <- 'Netto maandinkome
 attr(data_currentvsneveruser$oplmet_simplified,'label')  <- 'Hoogste opleiding met diploma'
 attr(data_currentvsneveruser$burgstat_simplified,'label')  <- 'Burgerlijke staat'
 attr(data_currentvsneveruser$woonvorm,'label')  <- 'Woonvorm huishouden'
-attr(data_currentvsneveruser$Riskgroup_contact,'label')  <- 'Frequentie op minder dan 1.5m van ouderen en mensen met een kwetsbare gezondheid zijn vanwege werk en/of (privé) zorgtaken'
 
 # Rename unclear levels (this is the LISS category label but only 17 and older are included in current sample)
 levels(data_currentvsneveruser$lftdcat)[levels(data_currentvsneveruser$lftdcat)=="15 - 24 jaar"] <- "17 - 24 jaar"
@@ -170,7 +168,6 @@ attr(data_currentvsneveruserneutral$nettocat_simplified,'label')  <- 'Netto maan
 attr(data_currentvsneveruserneutral$oplmet_simplified,'label')  <- 'Hoogste opleiding met diploma'
 attr(data_currentvsneveruserneutral$burgstat_simplified,'label')  <- 'Burgerlijke staat'
 attr(data_currentvsneveruserneutral$woonvorm,'label')  <- 'Woonvorm huishouden'
-attr(data_currentvsneveruserneutral$Riskgroup_contact,'label')  <- 'Frequentie op minder dan 1.5m van ouderen en mensen met een kwetsbare gezondheid zijn vanwege werk en/of (privé) zorgtaken'
 
 ##### Calculate size of user subgroups
 # Lookup table for totals of different user groups
@@ -199,7 +196,7 @@ user_totals[5] <- sum(data$user_status_intention == "Nooit gebruikt en wel van p
 
 ######### Set up data preprocessing and analysis for comparison with earlier waves ####################
 ##### Load dataset of previous wave (not included on Github) and remove missing values
-data_wave_min1_in <- read.spss('L_CoronaMelder_wave1_3p.sav', to.data.frame=TRUE, use.missings=FALSE)
+data_wave_min1_in <- read.spss('L_Corona_app_wave2_3p.sav', to.data.frame=TRUE, use.missings=FALSE)
 # Filter out the respondents that did not complete the entire survey 
 data_wave_min1 <- data_wave_min1_in[!is.na(data_wave_min1_in$duur),]
 
@@ -217,6 +214,11 @@ data_wave1 <- data_wave1_in[!is.na(data_wave1_in$duur),]
 
 ##### Wave 2
 data_wave2_in <- read.spss('L_Corona_app_wave2_3p.sav', to.data.frame=TRUE, use.missings=FALSE)
+# Filter out the respondents that did not complete the entire survey 
+data_wave2 <- data_wave2_in[!is.na(data_wave2_in$duur),]
+
+##### Wave 3
+data_wave3_in <- read.spss('L_Corona_app_wave3_3p.sav', to.data.frame=TRUE, use.missings=FALSE)
 # Filter out the respondents that did not complete the entire survey 
 data_wave2 <- data_wave2_in[!is.na(data_wave2_in$duur),]
 
@@ -322,7 +324,7 @@ Voor de vergelijkingen over tijd is een McNemar chi kwadraattoets uitgevoerd om 
 Aan dit onderzoek hebben `r nrow(data)` (gemiddelde leeftijd in jaren: `r round(mean(data$leeftijd), digits = 1)`, standaarddeviatie: `r round(sd(data$leeftijd), digits = 1)`, range: `r min(data$leeftijd)`-`r max(data$leeftijd)`; `r round((nrow(filter(data, geslacht == 'Vrouw'))/nrow(data))*100, digits = 1)`% vrouw) respondenten deelgenomen. De demografische kenmerken zijn te vinden in de onderstaande tabel. 
 
 ```{r, echo=FALSE, results="asis"} 
-tab.noby <- tableby(~ geslacht + lftdcat + sted_simplified + belbezig_simplified + oplmet_simplified + burgstat_simplified + nettocat_simplified + woonvorm + Riskgroup_contact, data=data)
+tab.noby <- tableby(~ geslacht + lftdcat + sted_simplified + belbezig_simplified + oplmet_simplified + burgstat_simplified + nettocat_simplified + woonvorm, data=data)
 summary(tab.noby, title="(\\#tab:mytableby) Demografische statieken van de steekproef")
 ```
 
@@ -1491,7 +1493,7 @@ ggdraw(theplot)
 #### Vertrouwen in aanpak van de overheid
 Respondenten zijn verdeeld wat betreft vertrouwen in de overheid met betrekking tot de aanpak van de coronacrisis (zie figuur \@ref(fig:trustgovernment)).
 
-```{r trustgovernment, echo=FALSE, fig.width=7, fig.height=3, fig.cap="Vertrouwen in de Nederlandse overheid", tab.cap="Vertrouwen in de Nederlandse overheid. Als het gaat om de bestrijding van corona, dan..."}
+```{r trustgovernment, eval=FALSE, echo=FALSE, fig.width=7, fig.height=3, fig.cap="Vertrouwen in de Nederlandse overheid", tab.cap="Vertrouwen in de Nederlandse overheid. Als het gaat om de bestrijding van corona, dan..."}
 
 # Order in which you would like to have the items appear (first = top, last = bottom) in the horizontal bar chart
 graph_variablenames = c("Trust_Gov_1", "Trust_Gov_2", "Trust_Gov_3", "Trust_Gov_4", "Trust_Gov_5", "Trust_Gov_6", "Trust_Gov_7")
@@ -2248,7 +2250,7 @@ Ook burgerlijke staat hing samen met gebruik van de CoronaMelder. Zo wordt de Co
 
 
 ```{r demobyuserstatus, echo=FALSE, results="asis", tab.cap = "Demografische kenmerken naar gebruikersstatus"} 
-tab.noby <- tableby(user_status ~ geslacht + lftdcat + sted_simplified + belbezig_simplified  + oplmet_simplified + burgstat_simplified + nettocat_simplified + woonvorm + Riskgroup_contact, cat.stats = "countrowpct", data=data_currentvsneveruser) # cat.stats = "countrowpct") for row percentages in stead of column percentages
+tab.noby <- tableby(user_status ~ geslacht + lftdcat + sted_simplified + belbezig_simplified  + oplmet_simplified + burgstat_simplified + nettocat_simplified + woonvorm, cat.stats = "countrowpct", data=data_currentvsneveruser) # cat.stats = "countrowpct") for row percentages in stead of column percentages
 summary(tab.noby, title="(\\#tab:mytableby2) Demografische kenmerken naar gebruikersstatus")
 ```
 
@@ -3018,301 +3020,6 @@ ft_out
 ```
 
 #### Vertrouwen in de overheid naar gebruikersstatus
-
-```{r chiPBeliefsTrustGovernmentusernonuser1, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment1_agree[(data$Trust_Gov_1 == 'Helemaal mee eens'| data$Trust_Gov_1 == 'Mee eens'| data$Trust_Gov_1 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment1_agree[(data$Trust_Gov_1 == 'Neutraal'| data$Trust_Gov_1 == 'Een beetje oneens'| data$Trust_Gov_1 == 'Oneens'| data$Trust_Gov_1 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruser$nomem_encr, ]
-data_selected$user_status = droplevels(data_selected$user_status)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment1_agree, data_selected$user_status)
-chisqtest = chisq.test(chisq.table) 
-```
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status == 'Gebruiker'& Beliefs_TrustGovernment1_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat ze de overheid heel professioneel vinden als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt (`r round((nrow(filter(data_selected, (user_status == 'Niet gebruiker' & Beliefs_TrustGovernment1_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Niet gebruiker'))))*100, digits = 1)`%).  
-
-```{r chiBeliefsTrustGovernmentusernonuserneutral1, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment1_agree[(data$Trust_Gov_1 == 'Helemaal mee eens'| data$Trust_Gov_1 == 'Mee eens'| data$Trust_Gov_1 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment1_agree[(data$Trust_Gov_1 == 'Neutraal'| data$Trust_Gov_1 == 'Een beetje oneens'| data$Trust_Gov_1 == 'Oneens'| data$Trust_Gov_1 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruserneutral$nomem_encr, ]
-data_selected$user_status_intention = droplevels(data_selected$user_status_intention)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment1_agree, data_selected$user_status_intention)
-chisqtest = chisq.test(chisq.table) 
-```
-
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status_intention == 'Gebruiker'& Beliefs_TrustGovernment1_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat ze de overheid heel professioneel vinden als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt en daarnaast aangaven neutraal te zijn in hun intentie om de CoronaMelder te gaan gebruiken (`r round((nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal' & Beliefs_TrustGovernment1_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal'))))*100, digits = 1)`%). 
-
-```{r chiPBeliefsTrustGovernmentusernonuser2, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment2_agree[(data$Trust_Gov_2 == 'Helemaal mee eens'| data$Trust_Gov_2 == 'Mee eens'| data$Trust_Gov_2 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment2_agree[(data$Trust_Gov_2 == 'Neutraal'| data$Trust_Gov_2 == 'Een beetje oneens'| data$Trust_Gov_2 == 'Oneens'| data$Trust_Gov_2 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruser$nomem_encr, ]
-data_selected$user_status = droplevels(data_selected$user_status)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment2_agree, data_selected$user_status)
-chisqtest = chisq.test(chisq.table) 
-```
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status == 'Gebruiker'& Beliefs_TrustGovernment2_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat de overheid haar taak heel goed uitvoert als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt (`r round((nrow(filter(data_selected, (user_status == 'Niet gebruiker' & Beliefs_TrustGovernment2_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Niet gebruiker'))))*100, digits = 1)`%).  
-
-```{r chiBeliefsTrustGovernmentusernonuserneutral2, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment2_agree[(data$Trust_Gov_2 == 'Helemaal mee eens'| data$Trust_Gov_2 == 'Mee eens'| data$Trust_Gov_2 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment2_agree[(data$Trust_Gov_2 == 'Neutraal'| data$Trust_Gov_2 == 'Een beetje oneens'| data$Trust_Gov_2 == 'Oneens'| data$Trust_Gov_2 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruserneutral$nomem_encr, ]
-data_selected$user_status_intention = droplevels(data_selected$user_status_intention)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment2_agree, data_selected$user_status_intention)
-chisqtest = chisq.test(chisq.table) 
-```
-
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status_intention == 'Gebruiker'& Beliefs_TrustGovernment2_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat de overheid haar taak heel goed uitvoert als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt en daarnaast aangaven neutraal te zijn in hun intentie om de CoronaMelder te gaan gebruiken (`r round((nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal' & Beliefs_TrustGovernment2_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal'))))*100, digits = 1)`%).
-
-```{r chiPBeliefsTrustGovernmentusernonuser3, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment3_agree[(data$Trust_Gov_3 == 'Helemaal mee eens'| data$Trust_Gov_3 == 'Mee eens'| data$Trust_Gov_3 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment3_agree[(data$Trust_Gov_3 == 'Neutraal'| data$Trust_Gov_3 == 'Een beetje oneens'| data$Trust_Gov_3 == 'Oneens'| data$Trust_Gov_3 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruser$nomem_encr, ]
-data_selected$user_status = droplevels(data_selected$user_status)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment3_agree, data_selected$user_status)
-chisqtest = chisq.test(chisq.table) 
-```
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status == 'Gebruiker'& Beliefs_TrustGovernment3_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat de overheid haar best doet om burgers goed te helpen als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt (`r round((nrow(filter(data_selected, (user_status == 'Niet gebruiker' & Beliefs_TrustGovernment3_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Niet gebruiker'))))*100, digits = 1)`%).  
-
-```{r chiBeliefsTrustGovernmentusernonuserneutral3, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment3_agree[(data$Trust_Gov_3 == 'Helemaal mee eens'| data$Trust_Gov_3 == 'Mee eens'| data$Trust_Gov_3 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment3_agree[(data$Trust_Gov_3 == 'Neutraal'| data$Trust_Gov_3 == 'Een beetje oneens'| data$Trust_Gov_3 == 'Oneens'| data$Trust_Gov_3 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruserneutral$nomem_encr, ]
-data_selected$user_status_intention = droplevels(data_selected$user_status_intention)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment3_agree, data_selected$user_status_intention)
-chisqtest = chisq.test(chisq.table) 
-```
-
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status_intention == 'Gebruiker'& Beliefs_TrustGovernment3_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat de overheid haar best doet om burgers goed te helpen als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt en daarnaast aangaven neutraal te zijn in hun intentie om de CoronaMelder te gaan gebruiken (`r round((nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal' & Beliefs_TrustGovernment3_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal'))))*100, digits = 1)`%).
-
-```{r chiPBeliefsTrustGovernmentusernonuser4, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment4_agree[(data$Trust_Gov_4 == 'Helemaal mee eens'| data$Trust_Gov_4 == 'Mee eens'| data$Trust_Gov_4 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment4_agree[(data$Trust_Gov_4 == 'Neutraal'| data$Trust_Gov_4 == 'Een beetje oneens'| data$Trust_Gov_4 == 'Oneens'| data$Trust_Gov_4 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruser$nomem_encr, ]
-data_selected$user_status = droplevels(data_selected$user_status)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment4_agree, data_selected$user_status)
-chisqtest = chisq.test(chisq.table) 
-```
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status == 'Gebruiker'& Beliefs_TrustGovernment4_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat de overheid in het belang van de burgers beslist als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt (`r round((nrow(filter(data_selected, (user_status == 'Niet gebruiker' & Beliefs_TrustGovernment4_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Niet gebruiker'))))*100, digits = 1)`%).  
-
-```{r chiBeliefsTrustGovernmentusernonuserneutral4, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment4_agree[(data$Trust_Gov_4 == 'Helemaal mee eens'| data$Trust_Gov_4 == 'Mee eens'| data$Trust_Gov_4 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment4_agree[(data$Trust_Gov_4 == 'Neutraal'| data$Trust_Gov_4 == 'Een beetje oneens'| data$Trust_Gov_4 == 'Oneens'| data$Trust_Gov_4 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruserneutral$nomem_encr, ]
-data_selected$user_status_intention = droplevels(data_selected$user_status_intention)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment4_agree, data_selected$user_status_intention)
-chisqtest = chisq.test(chisq.table) 
-```
-
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status_intention == 'Gebruiker'& Beliefs_TrustGovernment4_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat de overheid in het belang van de burgers beslist als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt en daarnaast aangaven neutraal te zijn in hun intentie om de CoronaMelder te gaan gebruiken (`r round((nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal' & Beliefs_TrustGovernment4_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal'))))*100, digits = 1)`%).
-
-```{r chiPBeliefsTrustGovernmentusernonuser5, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment5_agree[(data$Trust_Gov_5 == 'Helemaal mee eens'| data$Trust_Gov_5 == 'Mee eens'| data$Trust_Gov_5 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment5_agree[(data$Trust_Gov_5 == 'Neutraal'| data$Trust_Gov_5 == 'Een beetje oneens'| data$Trust_Gov_5 == 'Oneens'| data$Trust_Gov_5 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruser$nomem_encr, ]
-data_selected$user_status = droplevels(data_selected$user_status)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment5_agree, data_selected$user_status)
-chisqtest = chisq.test(chisq.table) 
-```
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status == 'Gebruiker'& Beliefs_TrustGovernment5_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat de overheid eerlijk uitlegt wat er aan de hand is als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt (`r round((nrow(filter(data_selected, (user_status == 'Niet gebruiker' & Beliefs_TrustGovernment5_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Niet gebruiker'))))*100, digits = 1)`%).  
-
-```{r chiBeliefsTrustGovernmentusernonuserneutral5, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment5_agree[(data$Trust_Gov_5 == 'Helemaal mee eens'| data$Trust_Gov_5 == 'Mee eens'| data$Trust_Gov_5 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment5_agree[(data$Trust_Gov_5 == 'Neutraal'| data$Trust_Gov_5 == 'Een beetje oneens'| data$Trust_Gov_5 == 'Oneens'| data$Trust_Gov_5 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruserneutral$nomem_encr, ]
-data_selected$user_status_intention = droplevels(data_selected$user_status_intention)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment5_agree, data_selected$user_status_intention)
-chisqtest = chisq.test(chisq.table) 
-```
-
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status_intention == 'Gebruiker'& Beliefs_TrustGovernment5_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat de overheid eerlijk uitlegt wat er aan de hand is als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt en daarnaast aangaven neutraal te zijn in hun intentie om de CoronaMelder te gaan gebruiken (`r round((nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal' & Beliefs_TrustGovernment5_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal'))))*100, digits = 1)`%).
-
-```{r chiPBeliefsTrustGovernmentusernonuser6, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment6_agree[(data$Trust_Gov_6 == 'Helemaal mee eens'| data$Trust_Gov_6 == 'Mee eens'| data$Trust_Gov_6 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment6_agree[(data$Trust_Gov_6 == 'Neutraal'| data$Trust_Gov_6 == 'Een beetje oneens'| data$Trust_Gov_6 == 'Oneens'| data$Trust_Gov_6 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruser$nomem_encr, ]
-data_selected$user_status = droplevels(data_selected$user_status)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment6_agree, data_selected$user_status)
-chisqtest = chisq.test(chisq.table) 
-```
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status == 'Gebruiker'& Beliefs_TrustGovernment6_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat ze de overheid eerlijk vinden over haar bedoelingen als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt (`r round((nrow(filter(data_selected, (user_status == 'Niet gebruiker' & Beliefs_TrustGovernment6_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Niet gebruiker'))))*100, digits = 1)`%).  
-
-```{r chiBeliefsTrustGovernmentusernonuserneutral6, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment6_agree[(data$Trust_Gov_6 == 'Helemaal mee eens'| data$Trust_Gov_6 == 'Mee eens'| data$Trust_Gov_6 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment6_agree[(data$Trust_Gov_6 == 'Neutraal'| data$Trust_Gov_6 == 'Een beetje oneens'| data$Trust_Gov_6 == 'Oneens'| data$Trust_Gov_6 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruserneutral$nomem_encr, ]
-data_selected$user_status_intention = droplevels(data_selected$user_status_intention)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment6_agree, data_selected$user_status_intention)
-chisqtest = chisq.test(chisq.table) 
-```
-
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status_intention == 'Gebruiker'& Beliefs_TrustGovernment6_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat ze de overheid eerlijk vinden over haar bedoelingen als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt en daarnaast aangaven neutraal te zijn in hun intentie om de CoronaMelder te gaan gebruiken (`r round((nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal' & Beliefs_TrustGovernment6_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal'))))*100, digits = 1)`%).
-
-```{r chiPBeliefsTrustGovernmentusernonuser7, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment7_agree[(data$Trust_Gov_7 == 'Helemaal mee eens'| data$Trust_Gov_7 == 'Mee eens'| data$Trust_Gov_7 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment7_agree[(data$Trust_Gov_7 == 'Neutraal'| data$Trust_Gov_7 == 'Een beetje oneens'| data$Trust_Gov_7 == 'Oneens'| data$Trust_Gov_7 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruser$nomem_encr, ]
-data_selected$user_status = droplevels(data_selected$user_status)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment7_agree, data_selected$user_status)
-chisqtest = chisq.test(chisq.table) 
-```
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status == 'Gebruiker'& Beliefs_TrustGovernment7_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat ze de overheid goed kunnen vertrouwen als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt (`r round((nrow(filter(data_selected, (user_status == 'Niet gebruiker' & Beliefs_TrustGovernment7_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status == 'Niet gebruiker'))))*100, digits = 1)`%).  
-
-```{r chiBeliefsTrustGovernmentusernonuserneutral7, echo=FALSE}
-# First calculate a proportion for the variable. 
-data$Beliefs_TrustGovernment7_agree[(data$Trust_Gov_7 == 'Helemaal mee eens'| data$Trust_Gov_7 == 'Mee eens'| data$Trust_Gov_7 == 'Een beetje mee eens')] <- "Totaal eens"
-data$Beliefs_TrustGovernment7_agree[(data$Trust_Gov_7 == 'Neutraal'| data$Trust_Gov_7 == 'Een beetje oneens'| data$Trust_Gov_7 == 'Oneens'| data$Trust_Gov_7 == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens" 
-# Select the data: Only compare the current users and never users
-data_selected = data[data$nomem_encr %in% data_currentvsneveruserneutral$nomem_encr, ]
-data_selected$user_status_intention = droplevels(data_selected$user_status_intention)
-
-# Convert into a table that can be used for the chi square test
-chisq.table = table(data_selected$Beliefs_TrustGovernment7_agree, data_selected$user_status_intention)
-chisqtest = chisq.test(chisq.table) 
-```
-
-De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage gebruikers (`r round((nrow(filter(data_selected, (user_status_intention == 'Gebruiker'& Beliefs_TrustGovernment7_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Gebruiker'))))*100, digits = 1)`%) dat aangaf het eens te zijn met de stelling dat ze de overheid goed kunnen vertrouwen als het gaat om de bestrijding van corona, vergeleken met degenen die de app nooit hebben gebruikt en daarnaast aangaven neutraal te zijn in hun intentie om de CoronaMelder te gaan gebruiken (`r round((nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal' & Beliefs_TrustGovernment7_agree == 'Totaal eens'))) /nrow(filter(data_selected, (user_status_intention == 'Nooit gebruikt en neutraal'))))*100, digits = 1)`%).
-
-
-```{r, echo=FALSE, tab.cap ="Vertrouwen in aanpak overheid naar gebruikersstatus. Aantal en totaal percentage dat het eens is met de stelling (helemaal mee eens, mee eens, een beetje mee eens). Als het gaat om de bestrijding van corona, dan..."}
-
-# === EDIT THESE TO CUSTOMIZE TABLE ===
-
-# Order in which you would like to have the items appear (first = top, last = bottom) in the horizontal bar chart
-graph_variablenames = c("Trust_Gov_1", "Trust_Gov_2", "Trust_Gov_3", "Trust_Gov_4", "Trust_Gov_5", "Trust_Gov_6", "Trust_Gov_7")
-graph_questionlabels = c("...vind ik de overheid heel professioneel", "...voert de overheid haar taak heel goed uit", "...doet de overheid haar best om burgers goed te helpen", "...beslist de overheid in het belang van burgers", "...legt de overheid eerlijk uit wat er aan de hand is", "...vind ik de overheid eerlijk over haar bedoelingen", "...kan ik de overheid goed vertrouwen");
-
-# Which values do we want to include in the table cells?
-include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
-
-# === NO MORE EDITS SHOULD BE NEEDED BELOW THIS POINT ===
-
-# Split by user groups
-data_grouptable = data.frame(matrix(ncol = length(colnames(user_totals))+1, nrow = length(graph_variablenames)))
-
-colnames(data_grouptable) <- c("variable", usergroup_names)
-
-# Set the values for each variable. Note: this still contains too much logic right now, the values that are counted 
-# as correct (in this case "Helemaal mee eens", "Mee eens", and "Een beetje mee eens") are manually added
-# and will not apply to all variables (sometimes it is "Waar", or a different likert-scale)
-for(idx in 1:length(graph_variablenames)) {
-  data_grouptable[idx,"variable"] = graph_questionlabels[idx]
-  
-  data_grouptable[idx,2] = nrow(filter(data, (eval(parse(text=graph_variablenames[idx]))) %in% include_vars & user_status == "Gebruiker"))
-  
-  data_grouptable[idx,3] = nrow(filter(data, (eval(parse(text=graph_variablenames[idx]))) %in% include_vars & user_status == "Niet gebruiker"))
-
-  data_grouptable[idx,4] = nrow(filter(data, (eval(parse(text=graph_variablenames[idx]))) %in% include_vars & user_status_intention == "Nooit gebruikt en niet van plan"))
-
-  data_grouptable[idx,5] = nrow(filter(data, (eval(parse(text=graph_variablenames[idx]))) %in% include_vars & user_status_intention == "Nooit gebruikt en neutraal"))
-
-  data_grouptable[idx,6] = nrow(filter(data, (eval(parse(text=graph_variablenames[idx]))) %in% include_vars & user_status_intention == "Nooit gebruikt en wel van plan"))
-}
-
-# Build the basic table
-ft <- flextable(
-  head(data_grouptable, n = nrow(data_grouptable))
-)
-
-# Header labels
-tmp_labels = as.data.frame(t(c("", usergroup_labels)))
-colnames(tmp_labels) <- c("variable", usergroup_names)
-ft <- set_header_labels(ft, values = tmp_labels)
-
-# Set up the footer of totals
-totals = c("Totaal", user_totals)
-totals[-1] <- paste(totals[-1], " (100.0%)")
-
-# Percentages and totals
-for(colname in colnames(data_grouptable)) {
-  if(colname != "variable") {
-    # Add percentage to cell
-    if (user_totals[1,colname]==0) {
-      ft <- compose(ft, j = colname, value = as_paragraph(eval(parse(text=colname)), " (0.0%)"))
-    }
-    else {
-      ft <- compose(ft, j = colname, value = as_paragraph(eval(parse(text=colname)), " (", sprintf("%.1f", eval(parse(text=colname))/user_totals[1,colname]*100), "%)"))
-    }
-    
-  }
-}
-
-# Actually add the footer with totals
-ft <- add_footer_row(ft, values = totals, colwidths = rep(1, length(totals)))
-
-# Change layout of table, and footer specifically
-ft <- fontsize(ft, size = 10, part = "all")
-ft <- font(ft, fontname = "Cambria", part = "all")
-ft <- align(ft, j = -1, align = "right", part = "footer")
-ft <- padding(ft, padding = 5, part = "footer")
-
-# Basic autofit does not work well with Word, found this code below
-# but it seems to make all columns of equal size (7 inch / number of columns?)
-# Might give unwanted results, so we might want to control this per column.
-
-# Note: 7 inch is the page width in Word
-# We now divide this into 1.5 inch for the first column (the values),
-# and divide the other columns equally among the remaining 5.5 inch.
-# If you only have one or few columns, you might want to reduce the total width below:
-table_width <- 7
-
-# Set width
-ft_out <- ft %>% autofit()
-ft_out <- width(ft_out, j = 1, width = 1.5)
-ft_out <- width(ft_out, j = -1, width = (table_width-1.5)/(length(colnames(data_grouptable))-1))
-
-ft_out
-
-```
 
 
 
@@ -8333,7 +8040,7 @@ data_currentwave_wavemin1$AdherenceNotificationMeasuresNoSymptoms_Visits_agree_w
 # Convert into a table that can be used for the chi square test
 mcnemar.table = table(data_currentwave_wavemin1$AdherenceNotificationMeasuresNoSymptoms_Visits_agree_cw, data_currentwave_wavemin1$AdherenceNotificationMeasuresNoSymptoms_Visits_agree_wmin1)
 mcnemartest = mcnemar.test(mcnemar.table)
-if( sum(mcnemar.table) != nrow(data)) stop('mcnemar table does not sum up to 1594')
+#if( sum(mcnemar.table) != nrow(data)) stop('mcnemar table does not sum up to 1594')
 ```
 De McNemar toets (X²(`r mcnemartest$parameter`) = `r round(mcnemartest$statistic, digits = 2)`, p `r ifelse(mcnemartest$p.value < 0.001, "<0.001", paste("=", round(mcnemartest$p.value, digits = 3)))`) liet ook zien dat er `r if(mcnemartest$p.value > 0.05){"g"}`een significant verschil was tussen de huidige meting (`r round((nrow(filter(data_currentwave_wavemin1, (AdherenceNotificationMeasuresNoSymptoms_Visits_agree_cw == 'Totaal eens_cw'))) /nrow(filter(data_currentwave_wavemin1)))*100, digits = 1)`%) en de vorige meting (`r round((nrow(filter(data_currentwave_wavemin1, (AdherenceNotificationMeasuresNoSymptoms_Visits_agree_wmin1 == 'Totaal eens_wmin1'))) /nrow(filter(data_currentwave_wavemin1)))*100, digits = 1)`%) in het percentage dat aangaf de intentie te hebben om geen bezoek te ontvangen.
 ```{r McNemarMcNemaradherencenotificationsintentiongpovertimenosympt, echo=FALSE}
