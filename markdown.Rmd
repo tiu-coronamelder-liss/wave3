@@ -220,10 +220,17 @@ data_wave2 <- data_wave2_in[!is.na(data_wave2_in$duur),]
 ##### Wave 3
 data_wave3_in <- read.spss('L_Corona_app_wave3_3p.sav', to.data.frame=TRUE, use.missings=FALSE)
 # Filter out the respondents that did not complete the entire survey 
-data_wave2 <- data_wave2_in[!is.na(data_wave2_in$duur),]
+data_wave3 <- data_wave3_in[!is.na(data_wave3_in$duur),]
 
 # Combine the dataset of all waves. Only keep participants that completed both waves. 
-data_allwaves = merge(data_wave1, data_wave2, by = "nomem_encr", all = FALSE, suffix = c("_w1", "_w2")) # all = FALSE to only include IDs present in both datasets.
+# all = FALSE to only include IDs present in both datasets.
+# data_allwaves1 = merge(data_wave1, data_wave2, by = "nomem_encr", all = FALSE, suffix = c("_w1", "_w2")) %>% merge(data_wave3, by = "nomem_encr", all = FALSE, suffix = c("_w3")) # This method of merging does not add the _w3 suffix
+
+# New method of merging to add all suffixes correctly.
+data_tmp = merge(data_wave1, data_wave3, by = "nomem_encr", all = FALSE, suffix = c("_w1", "_w3")) 
+data_allwaves = merge(data_wave2, data_wave3, by = "nomem_encr", all = FALSE, suffix = c("_w2", "_w3"))
+data_allwaves <- cbind(data_allwaves, select(data_tmp, contains("_w1")))
+
 
 ```
 ```{=openxml}
@@ -575,10 +582,10 @@ graph_questionlabels = c("Ik loop in de komende twee maanden risico op een besme
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -602,7 +609,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -611,7 +618,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -942,10 +949,10 @@ graph_questionlabels = c("In de afgelopen maanden, hoe vaak hebt u uw handen gew
 include_vars = c("Altijd", "Meestal", "Vaak")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -969,7 +976,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -978,7 +985,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -994,10 +1001,10 @@ graph_questionlabels = c("Bent u, toen u deze klachten had, naar buiten geweest?
 include_vars = c("Vaak", "Meestal", "Altijd")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -1022,7 +1029,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -1031,7 +1038,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -1237,10 +1244,10 @@ graph_questionlabels = c("Ik ben van plan om de komende 2 maanden mijn handen re
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -1264,7 +1271,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -1273,7 +1280,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -1447,10 +1454,10 @@ graph_questionlabels = c("Het coronavirus is een biologisch wapen dat in een lab
 include_vars = c("Zeker waar", "Misschien waar")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -1474,7 +1481,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -1483,7 +1490,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -1752,10 +1759,10 @@ graph_questionlabels = c("Hoe bekend was u met de CoronaMelder?");
 include_vars = c("Een beetje bekend", "Redelijk bekend", "Bekend", "Heel erg bekend")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -1779,7 +1786,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -1788,7 +1795,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -2113,10 +2120,10 @@ graph_questionlabels = c("Ik ben van plan de CoronaMelder in de komende 2 maande
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -2140,7 +2147,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -2149,7 +2156,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -2193,10 +2200,10 @@ graph_questionlabels = c("Ik ben van plan de CoronaMelder in de komende 2 maande
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -2220,7 +2227,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -2229,7 +2236,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -3488,10 +3495,10 @@ graph_questionlabels = c("Door de CoronaMelder app te gebruiken help ik mee bij 
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -3515,7 +3522,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -3524,7 +3531,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -4298,10 +4305,10 @@ graph_questionlabels = c("De techniek (bluetooth) die wordt gebruikt in de Coron
 include_vars = c("Zeker waar", "Misschien waar")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -4325,7 +4332,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -4334,7 +4341,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -4604,10 +4611,10 @@ graph_questionlabels = c("Gebruik van de CoronaMelder helpt de Nederlandse econo
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -4631,7 +4638,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -4640,7 +4647,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -5065,10 +5072,10 @@ graph_questionlabels = c("Ik denk dat het mij veel tijd en energie kost om de Co
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -5092,7 +5099,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -5101,7 +5108,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -5168,10 +5175,10 @@ graph_questionlabels = c("Het kost(te) mij veel tijd en energie om de CoronaMeld
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -5195,7 +5202,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -5204,7 +5211,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -5239,10 +5246,10 @@ graph_questionlabels = c("Ik ben in staat om de CoronaMelder te gebruiken");
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -5266,7 +5273,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -5275,7 +5282,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -5592,10 +5599,10 @@ graph_questionlabels = c("Ik heb een smartphone tot mijn beschikking met toegang
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -5619,7 +5626,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -5628,7 +5635,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -5951,10 +5958,10 @@ graph_questionlabels = c("Het heeft voor mij persoonlijke voordelen om de Corona
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -5978,7 +5985,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -5987,7 +5994,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -6358,10 +6365,10 @@ graph_questionlabels = c("Ik voel me verplicht om de CoronaMelder te gebruiken")
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -6385,7 +6392,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -6394,7 +6401,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -6712,10 +6719,10 @@ graph_questionlabels = c("Ik vind de CoronaMelder app eng",
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -6739,7 +6746,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -6748,7 +6755,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -7223,10 +7230,10 @@ graph_questionlabels = c("Veel mensen in mijn omgeving gebruiken de CoronaMelder
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -7250,7 +7257,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -7259,7 +7266,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -7706,10 +7713,10 @@ graph_questionlabels = c("Alle informatie die ik geef in de CoronaMelder wordt v
 include_vars = c("Zeker waar", "Misschien waar")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -7733,7 +7740,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -7742,7 +7749,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -8077,10 +8084,10 @@ graph_questionlabels = c("Bellen om coronatest aan te vragen",
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -8104,7 +8111,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -8113,7 +8120,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -8200,10 +8207,10 @@ graph_questionlabels = c("Bellen om coronatest aan te vragen",
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -8227,7 +8234,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -8236,7 +8243,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -8597,10 +8604,10 @@ graph_questionlabels = c("Bellen om coronatest aan te vragen",
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -8624,7 +8631,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -8633,7 +8640,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -8749,10 +8756,10 @@ graph_questionlabels = c("Bellen om coronatest aan te vragen",
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -8776,7 +8783,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -8785,7 +8792,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -8989,10 +8996,10 @@ graph_questionlabels = c("Ik ben in staat om te bellen voor een test",
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -9016,7 +9023,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -9025,7 +9032,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank())
 
 ggdraw(theplot)
@@ -9335,10 +9342,10 @@ graph_questionlabels = c("Het heeft voor mij persoonlijke voordelen om te bellen
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -9362,7 +9369,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -9371,7 +9378,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank())
 
 ggdraw(theplot)
@@ -9457,10 +9464,10 @@ graph_questionlabels = c("Het heeft voor mij persoonlijke nadelen om te bellen v
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -9484,7 +9491,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -9493,7 +9500,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank())
 
 ggdraw(theplot)
@@ -9745,10 +9752,10 @@ graph_questionlabels = c("Als ik besmet ben, ben ik van plan om dit door te geve
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -9772,7 +9779,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -9781,7 +9788,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank())
 
 ggdraw(theplot)
@@ -9941,10 +9948,10 @@ graph_questionlabels = c("Als ik besmet ben, ben ik van plan om dit door te geve
 include_vars = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -9968,7 +9975,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -9977,7 +9984,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank()) 
 
 ggdraw(theplot)
@@ -10146,10 +10153,10 @@ graph_questionlabels = c("Als ik de CoronaMelder gebruik, hoef ik me minder aan 
 include_vars = c("Zeker waar", "Misschien waar")
 
 # Which waves do we want to include in the table cells?
-include_waves = c("w1", "w2")
+include_waves = c("w1", "w2", "w3")
 
 # Labels for the waves
-wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020")
+wave_labels = c("19 okt-1 nov 2020", "7 dec-20 dec 2020", "18 jan-31 jan 2021")
 
 
 #### No changes should be needed after this point ####
@@ -10173,7 +10180,7 @@ for(wave_idx in 1:length(include_waves)) {
 data_overtime$variable <- factor(data_overtime$variable,levels = graph_questionlabels)
 
 # Create the plot
-data_ends <- data_overtime %>% filter(wave == include_waves[-1])
+# data_ends <- data_overtime %>% filter(wave == include_waves[-1])
 
 theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = variable)) +
   geom_line(aes(color = variable), size=1) +
@@ -10182,7 +10189,7 @@ theplot <- ggplot(data_overtime, aes(x = wave, y = perc_positiveanswer, group = 
   labs(x = "", y = "", fill = "") +
   scale_color_manual(values=brewer.pal(8, "Dark2"), labels=stringr::str_wrap(graph_questionlabels, width = 80)) +
   scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1), limits=c(0,1)) +
-  scale_x_discrete(labels=wave_labels, expand=c(2.5,-1)) +
+  scale_x_discrete(labels=wave_labels, expand=c(1,-1)) +
   theme(legend.position = "top", legend.direction = "vertical", legend.title = element_blank())
 
 ggdraw(theplot)
