@@ -37,7 +37,7 @@ FREQUENCIES VARIABLES=user_status_intention
   /ORDER=ANALYSIS.
 
 * Demographics.
-FREQUENCIES VARIABLES=geslacht lftdcat sted belbezig burgstat nettocat oplmet woonvorm Riskgroup_contact
+FREQUENCIES VARIABLES=geslacht lftdcat sted belbezig burgstat nettocat oplmet woonvorm
   /ORDER=ANALYSIS.
 
 * Health motivation.
@@ -56,7 +56,7 @@ FREQUENCIES VARIABLES= Beliefs_Conspiracy1 Beliefs_Conspiracy2
  /ORDER=ANALYSIS.
 
 * Trust government. 
-FREQUENCIES VARIABLES= Trust_Gov_1 Trust_Gov_6  
+FREQUENCIES VARIABLES= Beliefs_TrustGovernment
  /ORDER=ANALYSIS.
 
 
@@ -94,9 +94,9 @@ FILTER BY filter_$.
 EXECUTE.
 
 CROSSTABS
-  /TABLES=geslacht lftdcat sted belbezig burgstat nettocat oplmet woonvorm Riskgroup_contact BY Behavior_UTAUT
+  /TABLES=geslacht lftdcat sted belbezig burgstat nettocat oplmet woonvorm BY Behavior_UTAUT
   /FORMAT=AVALUE TABLES
-  /CELLS=COUNT ROW COLUMN 
+  /CELLS=COUNT ROW 
   /COUNT ROUND CELL.
 
 * Check user status health motivation / suscep / severity.
@@ -107,9 +107,16 @@ CROSSTABS
   /CELLS=COUNT ROW COLUMN 
   /COUNT ROUND CELL.
 
+CROSSTABS
+  /TABLES=HBM_PSus_self1 HBM_PSus_other2 BY user_status_intention
+  /FORMAT=AVALUE TABLES
+  /STATISTICS=CHISQ 
+  /CELLS=COUNT ROW COLUMN 
+  /COUNT ROUND CELL.
+
 * Check user status adherence to general measures. 
 CROSSTABS
-  /TABLES= Intention_AdherenceGeneralMeasures_handwashing Behavior_AdherenceGeneralMeasures_avoidbusyplaces BY Behavior_UTAUT
+  /TABLES= Intention_AdherenceGeneralMeasures_handwashing Behavior_AdherenceGeneralMeasures_avoidbusyplaces Intention_AdherenceGeneralMeasures_testwithsymptoms BY Behavior_UTAUT
   /FORMAT=AVALUE TABLES
   /STATISTICS=CHISQ 
   /CELLS=COUNT ROW COLUMN 
@@ -125,7 +132,7 @@ CROSSTABS
 
 * Check trust government. 
 CROSSTABS
-  /TABLES= Trust_Gov_1 Trust_Gov_6  BY Behavior_UTAUT
+  /TABLES= Beliefs_TrustGovernment BY Behavior_UTAUT
   /FORMAT=AVALUE TABLES
   /STATISTICS=CHISQ 
   /CELLS=COUNT ROW COLUMN 
@@ -141,23 +148,6 @@ FILTER BY filter_$.
 EXECUTE.
 CROSSTABS
   /TABLES= Beliefs_Conspiracy2 BY user_status_intention 
-  /FORMAT=AVALUE TABLES
-  /STATISTICS=CHISQ 
-  /CELLS=COUNT ROW COLUMN 
-  /COUNT ROUND CELL.
-
-* Expected use and value of the CoronaMelder.
-FREQUENCIES VARIABLES= PE1_UTAUT Beliefs_ResponseefficasyOther
- /ORDER=ANALYSIS.
-CROSSTABS
-  /TABLES= PE1_UTAUT BY Behavior_UTAUT
-  /FORMAT=AVALUE TABLES
-  /STATISTICS=CHISQ 
-  /CELLS=COUNT ROW COLUMN 
-  /COUNT ROUND CELL.
-
-CROSSTABS
-  /TABLES= PE1_UTAUT BY user_status_intention 
   /FORMAT=AVALUE TABLES
   /STATISTICS=CHISQ 
   /CELLS=COUNT ROW COLUMN 
