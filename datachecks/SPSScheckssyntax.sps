@@ -352,6 +352,10 @@ FREQUENCIES VARIABLES=  notifications_1
 FREQUENCIES VARIABLES=  AdherenceNotificationMeasuresNosymptoms_Quarantaine AdherenceNotificationMeasuresNoSymptoms_Visits AdherenceNotificationMeasuresSymptoms_Quarantaine AdherenceNotificationMeasuresSymptoms_Visits 
  /ORDER=ANALYSIS.
 
+* Intention to adhere with and without symptoms.
+FREQUENCIES VARIABLES=  AdherenceNotificationMeasuresNoSymptoms_Visits  
+ /ORDER=ANALYSIS.
+
 * Same but only for the current users. 
 USE ALL.
 COMPUTE filter_$=( ~ SYSMIS(duur)  & (Behavior_UTAUT = 1)).
@@ -405,3 +409,20 @@ FILTER BY filter_$.
 EXECUTE.
 FREQUENCIES VARIABLES=  Beliefs_falsesecurity1 Beliefs_falsesecurity2
  /ORDER=ANALYSIS.
+
+* Check of intention to test with symptoms: with versus without a notification: Only in current users. 
+USE ALL.
+COMPUTE filter_$=( ~ SYSMIS(duur)  & (Behavior_UTAUT = 1)).
+VARIABLE LABELS filter_$ ' ~ SYSMIS(duur)  & (Behavior_UTAUT ~= 2) (FILTER)'.
+VALUE LABELS filter_$ 0 'Not Selected' 1 'Selected'.
+FORMATS filter_$ (f1.0).
+FILTER BY filter_$.
+EXECUTE.
+
+CROSSTABS
+  /TABLES= Intention_AdherenceGeneralMeasures_testwithsymptoms BY AdherenceNotificationMeasuresSymptoms_Test
+  /FORMAT=AVALUE TABLES
+  /STATISTICS=CHISQ 
+  /CELLS=COUNT 
+  /COUNT ROUND CELL.
+

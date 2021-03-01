@@ -8906,30 +8906,6 @@ ggdraw(theplot)
 #### Intentie tot opvolgen adviezen gegeven in de melding - alleen huidig gebruikers
 Dezelfde bepalingen zijn ook gedaan in alleen de subsample (n = `r nrow(filter(data, Behavior_UTAUT == 'Ik gebruik de CoronaMelder app op dit moment'))`) die momenteel de CoronaMelder gebruikt. 
 
-```{r, echo=FALSE}
-# Comparison % agree with and without notification in case of symptoms. 
-
-# Prepare the two variables for the paired t test:
-# First calculate a proportion for the variable for after a notification. 
-data$AdherenceNotificationMeasuresSymptoms_Test_agree[(data$AdherenceNotificationMeasuresSymptoms_Test == 'Helemaal mee eens'| data$AdherenceNotificationMeasuresSymptoms_Test == 'Mee eens'| data$AdherenceNotificationMeasuresSymptoms_Test == 'Een beetje mee eens')] <- "Eens met melding"
-data$AdherenceNotificationMeasuresSymptoms_Test_agree[(data$AdherenceNotificationMeasuresSymptoms_Test == 'Neutraal'| data$AdherenceNotificationMeasuresSymptoms_Test == 'Een beetje oneens'| data$AdherenceNotificationMeasuresSymptoms_Test == 'Oneens'| data$AdherenceNotificationMeasuresSymptoms_Test == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens met melding"
-
-# Secondly, calculate a proportion for the variable for not after a notification. 
-data$Intention_AdherenceGeneralMeasures_testwithsymptoms_agree[(data$Intention_AdherenceGeneralMeasures_testwithsymptoms == 'Helemaal mee eens'| data$Intention_AdherenceGeneralMeasures_testwithsymptoms == 'Mee eens'| data$Intention_AdherenceGeneralMeasures_testwithsymptoms == 'Een beetje mee eens')] <- "Eens zonder melding"
-data$Intention_AdherenceGeneralMeasures_testwithsymptoms_agree[(data$Intention_AdherenceGeneralMeasures_testwithsymptoms == 'Neutraal'| data$Intention_AdherenceGeneralMeasures_testwithsymptoms == 'Een beetje oneens'| data$Intention_AdherenceGeneralMeasures_testwithsymptoms == 'Oneens'| data$Intention_AdherenceGeneralMeasures_testwithsymptoms == 'Helemaal mee oneens')] <- "Neutraal, niet mee eens zonder melding"
-
-# Select only the current users
-data_selected = data[ which(data$Behavior_UTAUT=='Ik gebruik de CoronaMelder app op dit moment'
-), ]
-
-# Convert into a table that can be used for the chi square test
-mcnemar.table = table(data_selected$AdherenceNotificationMeasuresSymptoms_Test_agree, data_selected$Intention_AdherenceGeneralMeasures_testwithsymptoms_agree)
-mcnemartest = mcnemar.test(mcnemar.table)
-
-```
-Er is respondenten gevraagd in hoeverre men het eens is het de stelling *Ik ben van plan de komende maanden een coronatest te doen als ik last heb van klachten die passen bij het coronavirus* (zie sectie 3.5.3). Daarnaast is gevraagd in hoeverre men in bovenstaand hypothetisch scenario, na het ontvangen van een melding, en in geval van klachten, eens is met de stelling *Na het lezen van dit bericht bel ik om een coronatest aan te vragen*. Er is gekeken of er een statistisch significant verschil is in het totaal percentage eens (een beetje mee eens, mee eens, helemaal mee eens) tussen deze twee vragen. 
-
-De McNemar toets (X²(`r mcnemartest$parameter`) = `r round(mcnemartest$statistic, digits = 2)`, p `r ifelse(mcnemartest$p.value < 0.001, "<0.001", paste("=", round(mcnemartest$p.value, digits = 3)))`) liet zien dat er `r if(mcnemartest$p.value > 0.05){"g"}`een significant verschil was tussen het percentage gebruikers dat aangaf een coronatest te doen in geval van symptomen (`r round((nrow(filter(data_selected, (Intention_AdherenceGeneralMeasures_testwithsymptoms_agree == 'Eens zonder melding'))) /nrow(filter(data_selected)))*100, digits = 1)`%) en het percentage dat aangaf een coronatest te aan te vragen na een melding in geval van symptomen (`r round((nrow(filter(data_selected, (AdherenceNotificationMeasuresSymptoms_Test_agree == 'Eens met melding'))) /nrow(filter(data_selected)))*100, digits = 1)`%).  
 
 ``` {r adherencenotificationsnosympcurrentusers, message=FALSE, echo=FALSE, fig.width=7, fig.height=2.2, fig.cap="Intentie tot opvolgen adviezen zonder symptomen - alleen huidig gebruikers", tab.cap="Intentie tot opvolgen adviezen zonder symptomen - alleen huidig gebruikers"}
 # Order in which you would like to have the items appear (first = top, last = bottom) in the horizontal bar chart
