@@ -4156,7 +4156,23 @@ ft_out
 ```
 
 #### CoronaMelder in de media over de tijd
+```{r McNemarmediaovertime, echo=FALSE}
+# First calculate a proportion for the variable for the current wave. 
+data_currentwave_wavemin1$Media_agree_cw[(data_currentwave_wavemin1$Media_cw == 'Vaak'| data_currentwave_wavemin1$Media_cw == 'Soms'| data_currentwave_wavemin1$Media_cw == 'Af en toe')] <- "Totaal eens_cw"
+data_currentwave_wavemin1$Media_agree_cw[(data_currentwave_wavemin1$Media_cw == 'Nooit'| data_currentwave_wavemin1$Media_cw == 'Weet ik niet')] <- "Neutraal, niet mee eens_cw"
 
+# Calculate a proportion for the variable for the previous wave. 
+data_currentwave_wavemin1$Media_agree_wmin1[(data_currentwave_wavemin1$Media_wmin1 == 'Vaak'| data_currentwave_wavemin1$Media_wmin1 == 'Soms'| data_currentwave_wavemin1$Media_wmin1 == 'Af en toe')] <- "Totaal eens_wmin1"
+data_currentwave_wavemin1$Media_wmin1[(data_currentwave_wavemin1$Media_wmin1 == 'Nooit'| data_currentwave_wavemin1$Media_wmin1 == 'Weet ik niet')] <- "Neutraal, niet mee eens_wmin1"
+
+data_currentwave_wavemin1$Media_wmin1[(data_currentwave_wavemin1$Media_wmin1 == 'Nooit'| is.na(data_currentwave_wavemin1$Media_wmin1))] <- "Neutraal, niet mee eens_wmin1"
+
+# Convert into a table that can be used for the chi square test
+mcnemar.table = table(data_currentwave_wavemin1$Media_agree_cw, data_currentwave_wavemin1$Media_agree_wmin1)
+mcnemartest = mcnemar.test(mcnemar.table)
+if( sum(mcnemar.table) != nrow(data)) stop('mcnemar table does not sum up to 1594')
+```
+De McNemar toets (X²(`r mcnemartest$parameter`) = `r round(mcnemartest$statistic, digits = 2)`, p `r ifelse(mcnemartest$p.value < 0.001, "<0.001", paste("=", round(mcnemartest$p.value, digits = 3)))`) liet zien dat er `r if(mcnemartest$p.value > 0.05){"g"}`een significant verschil was tussen de huidige meting (`r round((nrow(filter(data_currentwave_wavemin1, (Media_agree_cw == 'Totaal eens_cw'))) /nrow(filter(data_currentwave_wavemin1)))*100, digits = 1)`%) en de vorige meting (`r round((nrow(filter(data_currentwave_wavemin1, (Media_agree_wmin1 == 'Totaal eens_wmin1'))) /nrow(filter(data_currentwave_wavemin1)))*100, digits = 1)`%) in het percentage dat aangaf de CoronaMelder voorbij te hebben zien komen in de media en/of het nieuws in de afgelopen maand.
 
 
 ```{r, echo=FALSE, fig.width=5.5, fig.height=2.5, dpi = 300, fig.cap="Mediaberichten over de CoronaMelder over de tijd. Aantal en totaal percentage dat minstens af en toe berichten heeft gezien (af en toe, soms, vaak)."}
