@@ -11068,12 +11068,6 @@ ggdraw(theplot)
 ```
 
 
-
-```{=openxml}
-<w:p><w:r><w:br w:type="page"/></w:r></w:p>
-```
-
-
 # Appendix
 ## Additionele resultaten: Demografie naar gebruikersstatus - Paarsgewijze vergelijkingen
 Vergelijking subgroepen met ruwe p-waarden en FDR-gecorrigeerde p-waarden. 
