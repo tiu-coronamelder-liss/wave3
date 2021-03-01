@@ -285,6 +285,10 @@ CROSSTABS
   /CELLS=COUNT ROW COLUMN 
   /COUNT ROUND CELL.
 
+* Extra items voluntariness.
+FREQUENCIES VARIABLES=  Beliefs_voluntariness_employer Beliefs_voluntariness_school Beliefs_voluntariness_government Beliefs_voluntariness_civic
+ /ORDER=ANALYSIS.
+
 * Affective responses. 
 FREQUENCIES VARIABLES=  Beliefs_fear Beliefs_notificationfear
  /ORDER=ANALYSIS.
