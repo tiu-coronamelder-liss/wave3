@@ -4163,9 +4163,7 @@ data_currentwave_wavemin1$Media_agree_cw[(data_currentwave_wavemin1$Media_cw == 
 
 # Calculate a proportion for the variable for the previous wave. 
 data_currentwave_wavemin1$Media_agree_wmin1[(data_currentwave_wavemin1$Media_wmin1 == 'Vaak'| data_currentwave_wavemin1$Media_wmin1 == 'Soms'| data_currentwave_wavemin1$Media_wmin1 == 'Af en toe')] <- "Totaal eens_wmin1"
-data_currentwave_wavemin1$Media_wmin1[(data_currentwave_wavemin1$Media_wmin1 == 'Nooit'| data_currentwave_wavemin1$Media_wmin1 == 'Weet ik niet')] <- "Neutraal, niet mee eens_wmin1"
-
-data_currentwave_wavemin1$Media_wmin1[(data_currentwave_wavemin1$Media_wmin1 == 'Nooit'| is.na(data_currentwave_wavemin1$Media_wmin1))] <- "Neutraal, niet mee eens_wmin1"
+data_currentwave_wavemin1$Media_agree_wmin1[(data_currentwave_wavemin1$Media_wmin1 == 'Nooit'| data_currentwave_wavemin1$Media_wmin1 == 'Weet ik niet')] <- "Neutraal, niet mee eens_wmin1"
 
 # Convert into a table that can be used for the chi square test
 mcnemar.table = table(data_currentwave_wavemin1$Media_agree_cw, data_currentwave_wavemin1$Media_agree_wmin1)
