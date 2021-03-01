@@ -4228,6 +4228,33 @@ ggdraw(theplot)
 
 ```
 
+```{r ChisquareMediaValenceOvertime, echo=FALSE}
+# First calculate a proportion for the variable for the current wave. 
+data_currentwave_wavemin1$MediaValence_agree_cw[(data_currentwave_wavemin1$MediaValence_cw == 'Heel erg positief'| data_currentwave_wavemin1$MediaValence_cw == 'Positief'| data_currentwave_wavemin1$MediaValence_cw == 'Een beetje positief')] <- "Positief_cw"
+
+data_currentwave_wavemin1$MediaValence_agree_cw[(data_currentwave_wavemin1$MediaValence_cw == 'Neutraal'| data_currentwave_wavemin1$MediaValence_cw == 'Een beetje negatief'| data_currentwave_wavemin1$MediaValence_cw == 'Negatief'| data_currentwave_wavemin1$MediaValence_cw == 'Heel erg negatief'| data_currentwave_wavemin1$MediaValence_cw == 'Weet ik niet')] <- "Neutraal, negatief, weet niet_cw"
+
+
+# Calculate a proportion for the variable for the previous wave. 
+data_currentwave_wavemin1$MediaValence_agree_wmin1[(data_currentwave_wavemin1$MediaValence_wmin1 == 'Heel erg positief'| data_currentwave_wavemin1$MediaValence_wmin1 == 'Positief'| data_currentwave_wavemin1$MediaValence_wmin1 == 'Een beetje positief')] <- "Positief_wmin1"
+
+data_currentwave_wavemin1$MediaValence_agree_wmin1[(data_currentwave_wavemin1$MediaValence_wmin1 == 'Neutraal'| data_currentwave_wavemin1$MediaValence_wmin1 == 'Een beetje negatief'| data_currentwave_wavemin1$MediaValence_wmin1 == 'Negatief'| data_currentwave_wavemin1$MediaValence_wmin1 == 'Heel erg negatief'| data_currentwave_wavemin1$MediaValence_wmin1 == 'Weet ik niet')] <- "Neutraal, negatief, weet niet_wmin1"
+
+# Similar to BI1a and BI1b: take into account whether respondents saw the CoronaMelder in the media, otherwise they
+# did not answer this current question on valence.
+data_selected_cw = data_currentwave_wavemin1[data_currentwave_wavemin1$Media_cw == 'Vaak' | data_currentwave_wavemin1$Media_cw == 'Soms' | data_currentwave_wavemin1$Media_cw == 'Af en toe', ]
+
+data_selected_wmin1 = data_currentwave_wavemin1[data_currentwave_wavemin1$Media_wmin1 == 'Vaak' | data_currentwave_wavemin1$Media_wmin1 == 'Soms' | data_currentwave_wavemin1$Media_wmin1 == 'Af en toe', ]
+
+# Convert into a table that can be used for the chi square test
+chisq.table = rbind(table(data_selected_cw$MediaValence_agree_cw), table(data_selected_wmin1$MediaValence_agree_wmin1))
+rownames(chisq.table) <- c('cw', 'wmin1')
+
+# Convert into a table that can be used for the chi square test
+chisqtest = chisq.test(chisq.table) 
+```
+Om te bepalen of de toon van de mediaberichten over de CoronaMelder verschilt tussen de huidige en de vorige wave is een chi kwadraat uitgevoerd. Een complexiteit in deze analyse is dat sommige deelnemers in de vorige wave de CoronaMelder in de media hadden gezien en in de huidige niet (meer), of andersom. Om deze reden is in deze test een vergelijking gemaakt waarin het voorbij zien komen in de media in beide waves is meegenomen. De chi kwadraat toets (X²(`r chisqtest$parameter`) = `r round(chisqtest$statistic, digits = 2)`, p `r ifelse(chisqtest$p.value < 0.001, "<0.001", paste("=", round(chisqtest$p.value, digits = 3)))`) liet zien dat er `r if(chisqtest$p.value > 0.05){"g"}`een significant verschil was in het percentage respondenten in de huidige wave (`r round((nrow(filter(data_selected_cw, MediaValence_agree_cw == 'Positief_cw')) /nrow(data_selected_cw))*100, digits = 1)`%) dat aangaf dat de berichten/items over de CoronaMelder in de media over het algemeen positief waren, vergeleken met het percentage uit de vorige wave (`r round((nrow(filter(data_selected_wmin1, MediaValence_agree_wmin1 == 'Positief_wmin1')) /nrow(data_selected_wmin1))*100, digits = 1)`%).
+
 ```{r, echo=FALSE, fig.width=5.5, fig.height=2.5, dpi = 300, fig.cap="Toon van mediaberichten over de CoronaMelder over de tijd. Aantal en totaal percentage dat deze toon als positief beschouwt (een beetje positief, positief, heel erg positief)."}
 
 # Order in which you would like to have the items appear (first = top, last = bottom) in the horizontal bar chart
@@ -8341,11 +8368,9 @@ In figuur \@ref(fig:adherencenotificationsnosymp) is te zien dat respondenten ov
 # Order in which you would like to have the items appear (first = top, last = bottom) in the horizontal bar chart
 graph_variablenames = c("AdherenceNotificationMeasuresNosymptoms_Test", 
                         "AdherenceNotificationMeasuresNosymptoms_Quarantaine", 
-                        "AdherenceNotificationMeasuresNoSymptoms_Visits", 
                         "AdherenceNotificationMeasuresNosymptoms_CallGP")
 graph_questionlabels = c("Bellen om coronatest aan te vragen", 
                          "Thuisblijven zo lang de melding adviseert", 
-                         "Geen bezoek ontvangen", 
                          "De huisarts bellen"); 
 
 
@@ -8375,6 +8400,62 @@ theplot <- ggplot(data=data_graph_longformat, aes(fill=value, x=variable)) + the
 
 aligned <- align_plots(baseplot, theplot, align="v")
 ggdraw(aligned[[2]])
+```
+
+Omdat de vraag met betrekking tot bezoek ontvangen niet was uitgezet bij alle deelnemers (1370 van de 1447 in totaal) presenteren we de reacties op deze vraag in een losse grafiek:
+
+``` {r adherencenotificationsnosympvisit, echo=FALSE, fig.width=7, fig.height=2.5, fig.cap="Intentie tot opvolgen adviezen zonder symptomen", tab.cap="Intentie tot opvolgen adviezen zonder symptomen"}
+# Order in which you would like to have the items appear (first = top, last = bottom) in the horizontal bar chart
+graph_variablenames = c("AdherenceNotificationMeasuresNoSymptoms_Visits")
+graph_questionlabels = c("Geen bezoek ontvangen"); 
+
+
+# These questions have 8 answer categories: Helemaal mee eens - Helemaal mee oneens and no use. The following color palette should be used:
+color_palette = my_palette_nonuse
+# Order of the question categories: first = most green, last = most red
+graph_answercategories = c("Ik zou de CoronaMelder app niet gebruiken", "Helemaal mee eens", "Mee eens", "Een beetje mee eens", "Neutraal", "Een beetje oneens", "Oneens", "Helemaal mee oneens"); 
+
+# Create a dataframe for the plot
+#First only keep the variables you wish to keep. Note: nomem_enc is the participant id
+data_graph_wideformat = select(data, nomem_encr, all_of(graph_variablenames))
+
+#Convert it to long format
+data_graph_longformat = melt(data_graph_wideformat, id.vars = c('nomem_encr'), measure.vars = graph_variablenames)
+
+# Set the correct ordering of the questions (by default the first variable is placed on the bottom)
+data_graph_longformat$variable <- factor(data_graph_longformat$variable,levels = rev(graph_variablenames))
+
+# Also invert the order of the question labels (as default is that the first element of the vector is placed on the bottom)
+graph_questionlabels = rev(graph_questionlabels)
+
+# Set the correct ordering of the answer categories (by default on alphabetic order)
+data_graph_longformat$value <- factor(data_graph_longformat$value,levels = graph_answercategories)
+
+# Remove NA
+data_graph_longformat = na.omit(data_graph_longformat)
+
+# Create the plot
+theplot <- ggplot(data=data_graph_longformat, aes(fill=value, x=variable)) + theme_bw() + geom_bar(aes(y = (..count..)/sum(..count..)*length(graph_variablenames))) + scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1)) + coord_flip() + labs(x = "", y = "", fill = "") + scale_fill_manual(values=color_palette, drop=FALSE, labels=stringr::str_wrap(graph_answercategories, width = 10)) + scale_x_discrete(labels=stringr::str_wrap(graph_questionlabels, width = 30)) + theme(plot.margin = margin(0, 0, 0, 0), legend.text=element_text(size=8))
+
+aligned <- align_plots(baseplot, theplot, align="v")
+ggdraw(aligned[[2]])
+
+```
+
+``` {r adherencenotificationsnosymptab, echo=FALSE, fig.width=7, fig.height=2.5, fig.cap="Intentie tot opvolgen adviezen zonder symptomen", tab.cap="Intentie tot opvolgen adviezen zonder symptomen"}
+# Order in which you would like to have the items appear (first = top, last = bottom) in the horizontal bar chart
+graph_variablenames = c("AdherenceNotificationMeasuresNosymptoms_Test", 
+                        "AdherenceNotificationMeasuresNosymptoms_Quarantaine", 
+                        "AdherenceNotificationMeasuresNoSymptoms_Visits", 
+                        "AdherenceNotificationMeasuresNosymptoms_CallGP")
+graph_questionlabels = c("Bellen om coronatest aan te vragen", 
+                         "Thuisblijven zo lang de melding adviseert", 
+                         "Geen bezoek ontvangen", 
+                         "De huisarts bellen"); 
+
+# Create a dataframe for the plot
+#First only keep the variables you wish to keep. Note: nomem_enc is the participant id
+data_graph_wideformat = select(data, nomem_encr, all_of(graph_variablenames))
 
 # Create the table. Step 1: new data frame containing counts
 data_table = data.frame(matrix(0, ncol = 0, nrow = length(levels(data[[graph_variablenames[1]]]))))
@@ -8384,7 +8465,7 @@ table_questionlabels = list()
 table_questionlabels["table_answercategories"] <- ""
 
 # We also need the 'unreversed' question labels ;)
-graph_questionlabels_unrev <- rev(graph_questionlabels)
+graph_questionlabels_unrev <- graph_questionlabels
 
 # Inefficient loop, but it does a lot for us: add the counts as columns to the dataframe,
 # and add the correct labels for column headings
@@ -8854,11 +8935,9 @@ De McNemar toets (X²(`r mcnemartest$parameter`) = `r round(mcnemartest$statisti
 # Order in which you would like to have the items appear (first = top, last = bottom) in the horizontal bar chart
 graph_variablenames = c("AdherenceNotificationMeasuresNosymptoms_Test", 
                         "AdherenceNotificationMeasuresNosymptoms_Quarantaine", 
-                        "AdherenceNotificationMeasuresNoSymptoms_Visits", 
                         "AdherenceNotificationMeasuresNosymptoms_CallGP")
 graph_questionlabels = c("Bellen om coronatest aan te vragen", 
                          "Thuisblijven zo lang de melding adviseert", 
-                         "Geen bezoek ontvangen", 
                          "De huisarts bellen"); 
 
 # These questions have 8 answer categories: Helemaal mee eens - Helemaal mee oneens and no use. 
@@ -8892,15 +8971,78 @@ theplot <- ggplot(data=data_graph_longformat, aes(fill=value, x=variable)) + the
 aligned <- align_plots(baseplot, theplot, align="v")
 ggdraw(aligned[[2]])
 
+```
+
+Omdat de vraag met betrekking tot bezoek ontvangen niet was uitgezet bij alle deelnemers (437 van de 463 gebruikers) presenteren we de reacties op deze vraag in een losse grafiek:
+
+``` {r adherencenotificationsnosympcurrentusersvisit, message=FALSE, echo=FALSE, fig.width=7, fig.height=2.2, fig.cap="Intentie tot opvolgen adviezen zonder symptomen - alleen huidig gebruikers", tab.cap="Intentie tot opvolgen adviezen zonder symptomen - alleen huidig gebruikers"}
+# Order in which you would like to have the items appear (first = top, last = bottom) in the horizontal bar chart
+graph_variablenames = c("AdherenceNotificationMeasuresNoSymptoms_Visits")
+graph_questionlabels = c("Geen bezoek ontvangen"); 
+
+# These questions have 8 answer categories: Helemaal mee eens - Helemaal mee oneens and no use. 
+# However, for without symptoms, nobody answered "Ik zou de CoronaMelder app niet gebruiken". Therefore, the following color palette should be used:
+color_palette = my_palette7
+# Order of the question categories: first = most green, last = most red
+graph_answercategories = c("Helemaal mee eens", "Mee eens", "Een beetje mee eens", "Neutraal", "Een beetje oneens", "Oneens", "Helemaal mee oneens"); 
+
+# Create a dataframe for the plot
+# Select only the current users
+data_selected = data[ which(data$Behavior_UTAUT=='Ik gebruik de CoronaMelder app op dit moment'
+), ]
+#First only keep the variables you wish to keep. Note: nomem_enc is the participant id
+data_graph_wideformat = select(data_selected, nomem_encr, all_of(graph_variablenames))
+
+#Convert it to long format
+data_graph_longformat = melt(data_graph_wideformat, id.vars = c('nomem_encr'), measure.vars = graph_variablenames)
+
+# Set the correct ordering of the questions (by default the first variable is placed on the bottom)
+data_graph_longformat$variable <- factor(data_graph_longformat$variable,levels = rev(graph_variablenames))
+
+# Also invert the order of the question labels (as default is that the first element of the vector is placed on the bottom)
+graph_questionlabels = rev(graph_questionlabels)
+
+# Set the correct ordering of the answer categories (by default on alphabetic order)
+data_graph_longformat$value <- factor(data_graph_longformat$value,levels = graph_answercategories)
+
+# Remove NAs
+data_graph_longformat = na.omit(data_graph_longformat)
+
+# Create the plot
+theplot <- ggplot(data=data_graph_longformat, aes(fill=value, x=variable)) + theme_bw() + geom_bar(aes(y = (..count..)/sum(..count..)*length(graph_variablenames))) + scale_y_continuous(breaks=seq(0, 1, 0.1), labels=percent_format(accuracy = 1)) + coord_flip() + labs(x = "", y = "", fill = "") + scale_fill_manual(values=color_palette, drop=FALSE, labels=stringr::str_wrap(graph_answercategories, width = 10)) + scale_x_discrete(labels=stringr::str_wrap(graph_questionlabels, width = 30)) + theme(plot.margin = margin(0, 0, 0, 0), legend.text=element_text(size=8))
+
+aligned <- align_plots(baseplot, theplot, align="v")
+ggdraw(aligned[[2]])
+
+```
+
+``` {r adherencenotificationsnosympcurrentuserstable, message=FALSE, echo=FALSE, fig.width=7, fig.height=2.2, fig.cap="Intentie tot opvolgen adviezen zonder symptomen - alleen huidig gebruikers", tab.cap="Intentie tot opvolgen adviezen zonder symptomen - alleen huidig gebruikers"}
+# Order in which you would like to have the items appear (first = top, last = bottom) in the horizontal bar chart
+graph_variablenames = c("AdherenceNotificationMeasuresNosymptoms_Test", 
+                        "AdherenceNotificationMeasuresNosymptoms_Quarantaine", 
+                        "AdherenceNotificationMeasuresNoSymptoms_Visits", 
+                        "AdherenceNotificationMeasuresNosymptoms_CallGP")
+graph_questionlabels = c("Bellen om coronatest aan te vragen", 
+                         "Thuisblijven zo lang de melding adviseert", 
+                         "Geen bezoek ontvangen", 
+                         "De huisarts bellen"); 
+
+# Create a dataframe for the plot
+# Select only the current users
+data_selected = data[ which(data$Behavior_UTAUT=='Ik gebruik de CoronaMelder app op dit moment'
+), ]
+#First only keep the variables you wish to keep. Note: nomem_enc is the participant id
+data_graph_wideformat = select(data_selected, nomem_encr, all_of(graph_variablenames))
+
+# We also need the 'unreversed' question labels ;)
+graph_questionlabels_unrev <- graph_questionlabels
+
 # Create the table. Step 1: new data frame containing counts
 data_table = data.frame(matrix(0, ncol = 0, nrow = length(levels(data[[graph_variablenames[1]]]))))
 
 # We need one extra (empty) column label for the row with the possible values
 table_questionlabels = list()
 table_questionlabels["table_answercategories"] <- ""
-
-# We also need the 'unreversed' question labels ;)
-graph_questionlabels_unrev <- rev(graph_questionlabels)
 
 # Inefficient loop, but it does a lot for us: add the counts as columns to the dataframe,
 # and add the correct labels for column headings
