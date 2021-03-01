@@ -11107,6 +11107,6 @@ pairwiseNominalIndependence(Matriz,
 
 # Bijlagen
 Als bijlage kunt u bij dit rapport vinden:  
-- Vragenlijst wave 2  
+- Vragenlijst wave 3  
 - Vergelijking demografie sample huidig onderzoek, LISS core panel en CBS  
 
